@@ -2,8 +2,9 @@
 
 import { useParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { fetchNoteById } from '@/lib/api';
+import { fetchNoteById } from '@/lib/api/clientApi';
 import Link from 'next/link';
+import { Note } from '@/types/note'; // Додай цей імпорт
 import css from './NoteDetails.module.css';
 
 export default function NoteDetailsClient() {
@@ -12,9 +13,10 @@ export default function NoteDetailsClient() {
 
   const { data: note, isLoading, error } = useQuery({
     queryKey: ['note', id],
-    queryFn: () => fetchNoteById(id),
-    refetchOnMount: false, // Вимога ментора: не робити повторний запит при фокусі
-    enabled: !!id, // Запит не піде, поки немає id
+    // 1. Додаємо .then(res => res.data), щоб отримати чистий об'єкт нотатки
+    queryFn: () => fetchNoteById(id).then(res => res.data as Note), 
+    refetchOnMount: false,
+    enabled: !!id,
   });
 
   if (isLoading) return <div className={css.loader}>Loading note details...</div>;
@@ -31,6 +33,7 @@ export default function NoteDetailsClient() {
       <Link href="/notes" className={css.backLink}>← Back to all notes</Link>
       
       <header className={css.header}>
+        {/* Тепер TypeScript бачить ці поля! */}
         <h1 className={css.title}>{note.title}</h1>
         {note.tag && <span className={css.tag}>{note.tag}</span>}
       </header>

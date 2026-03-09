@@ -10,7 +10,7 @@ const getAuthHeaders = async () => {
   };
 };
 
-export const fetchNoteByIdServer = async (id: string) => {
+export const fetchNoteById = async (id: string) => {
   const headers = await getAuthHeaders();
   return api.get(`/notes/${id}`, headers);
 };

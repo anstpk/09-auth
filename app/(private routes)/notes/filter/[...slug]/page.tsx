@@ -1,5 +1,5 @@
 import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
-import { fetchNotes } from '@/lib/api';
+import { fetchNotesServer } from '@/lib/api/serverApi';
 import NotesClient from './Notes.client';
 import React from 'react';
 import { Metadata } from 'next';
@@ -10,7 +10,6 @@ interface PageProps {
   }>;
 }
 
-// Функція для SEO
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
   const resolvedParams = await props.params;
   const filter = resolvedParams.slug?.[0] || 'all';
@@ -39,7 +38,8 @@ export default async function NotesPage(props: PageProps) {
   try {
     await queryClient.prefetchQuery({
       queryKey: ['notes', tagToFetch], 
-      queryFn: () => fetchNotes(1, 12, '', tagToFetch), 
+      // ВИПРАВЛЕНО: назва функції тепер fetchNotesServer + додано .then
+      queryFn: () => fetchNotesServer(1, 12, '', tagToFetch).then(res => res.data), 
     });
   } catch (error) {
     console.error("Prefetch error:", error);

@@ -1,19 +1,21 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { fetchNoteById } from '@/lib/api'; // Виправляємо шлях імпорту
+import { fetchNoteById } from '@/lib/api/clientApi'; // Виправляємо шлях імпорту
 import css from './NotePreview.module.css';
+import { Note } from '@/types/note';
 
 interface NotePreviewProps {
   id: string;
 }
 
 export default function NotePreview({ id }: NotePreviewProps) {
-  const { data: note, isLoading, isError } = useQuery({
-    queryKey: ['note', id],
-    queryFn: () => fetchNoteById(id),
-    enabled: !!id, // Запит виконується лише якщо передано id
-  });
+  const { data: note, isLoading, isError } = useQuery<Note>({
+  queryKey: ['note', id],
+  // 2. Додай .then(res => res.data)
+  queryFn: () => fetchNoteById(id).then(res => res.data),
+  enabled: !!id,
+});
 
   if (isLoading) {
     return <div className={css.loader}>Loading note details...</div>;
